@@ -1,5 +1,4 @@
 # Tournament Schema
-=============
 
 To run the code navigate in your terminal to the vagrant directory and run these commands:
 
