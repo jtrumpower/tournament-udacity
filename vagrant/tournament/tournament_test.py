@@ -2,7 +2,7 @@
 #
 # Test cases for tournament.py
 
-from tournament import *
+from tournament_dao import *
 
 def testDeleteMatches():
     deleteMatches()
