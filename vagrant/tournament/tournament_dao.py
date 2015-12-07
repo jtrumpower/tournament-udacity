@@ -2,40 +2,24 @@
 # 
 # tournament.py -- implementation of a Swiss-system tournament
 #
-
-import psycopg2
-
-
-def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+from db import *
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    db = connect()
-    c = db.cursor()
-    c.execute("DELETE FROM matches")
-    db.commit()
-    db.close()
+    DB().execute("DELETE FROM matches", True)
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    db = connect()
-    c = db.cursor()
-    c.execute("DELETE FROM players")
-    db.commit()
-    db.close()
+    DB().execute("DELETE FROM players", True)
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT count(*) as sum FROM players")
-    fetched = c.fetchall()
-    db.close()
-    [count] = [row[0]for row in fetched]
-    return count
+    db = DB().execute("SELECT count(*) as sum FROM players")
+    fetched = db["cursor"].fetchall()
+    db["conn"].close()
+
+    return fetched[0][0]
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -46,11 +30,7 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
-    db.commit()
-    db.close()
+    DB().execute("INSERT INTO players (name) VALUES (%s)", True, (name,))
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -65,12 +45,10 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT * FROM standings")
-    fetched = c.fetchall()
-    db.close()
-    #print fetched
+    db = DB().execute("SELECT * FROM standings")
+    fetched = db["cursor"].fetchall()
+    db["conn"].close()
+ 
     return fetched
 
 def reportMatch(winner, loser):
@@ -80,11 +58,7 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("INSERT INTO matches(player_one, player_two, winner) VALUES (%s,%s,%s)", (winner,loser,winner,))
-    db.commit()
-    db.close()
+    DB().execute("INSERT INTO matches(player_one, player_two, winner) VALUES ({player_one},{player_two},{winner})".format(player_one=winner,player_two=loser,winner=winner), True)
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -101,33 +75,18 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("select odd.id,odd.name,even.id,even.name from odd_rows as odd join even_rows as even on odd.row = even.row;")
-    fetched = c.fetchall()
-    db.close()
+    db = DB().execute("select odd.id,odd.name,even.id,even.name from odd_rows as odd join even_rows as even on odd.row = even.row;")
+    fetched = db["cursor"].fetchall()
+    db["conn"].close()
 
     return fetched
 
 def getWinner():
-    """Returns a list of pairs of players for the next round of a match.
-  
-    Assuming that there are an even number of players registered, each player
-    appears exactly once in the pairings.  Each player is paired with another
-    player with an equal or nearly-equal win record, that is, a player adjacent
-    to him or her in the standings.
-  
-    Returns:
-      A list of tuples, each of which contains (id1, name1, id2, name2)
-        id1: the first player's unique id
-        name1: the first player's name
-        id2: the second player's unique id
-        name2: the second player's name
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("select name from standings where wins = (select max(wins) from standings);")
-    fetched = c.fetchall()
-    db.close()
+    Returns a String, the name of the winner of the tournament.
+    """
+    db = DB().execute("select name from standings where wins = (select max(wins) from standings);")
+    fetched = db["cursor"].fetchall()
+    db["conn"].close()
 
     return fetched
