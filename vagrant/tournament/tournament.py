@@ -6,6 +6,9 @@
 from tournament_dao import *
 
 def runTournament():
+    """
+    run a simulated tournament
+    """
     players = 8
     deleteMatches()
     deletePlayers()
@@ -16,12 +19,18 @@ def runTournament():
 
 
 def addPlayers(numPlayers):
+    """
+    Add players to the simulated tournament
+    """
     for i in range(8):
         player = "player " + str(i)
         registerPlayer(player)
 
 
 def calculateMatches(numMatches):
+    """
+    Calculate the matches for the simulated tournament.
+    """
     standings = playerStandings()
     [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
     reportMatch(id1, id2)

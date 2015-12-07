@@ -20,6 +20,7 @@ class DB:
         Executes SQL queries
         :param str sql_query_string: Contain the query string to be executed
         :param bool and_close: If true, closes the database connection after executing and commiting the SQL Query
+        :param tuple params: Contains variables to be inserted into the sql query
         """
         cursor = self.cursor()
         if params != None:
