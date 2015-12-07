@@ -14,8 +14,8 @@ def runTournament():
     deletePlayers()
     addPlayers(players)
     calculateMatches(players)
-    [name] = [row[0] for row in getWinner()]
-    print "winner: {name}!".format(name=name)
+    name = getWinner()
+    print "winner: {name}!".format(name=name[0])
 
 
 def addPlayers(numPlayers):

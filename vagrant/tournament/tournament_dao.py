@@ -16,10 +16,10 @@ def deletePlayers():
 def countPlayers():
     """Returns the number of players currently registered."""
     db = DB().execute("SELECT count(*) as sum FROM players")
-    fetched = db["cursor"].fetchall()
+    fetched = db["cursor"].fetchone()
     db["conn"].close()
 
-    return fetched[0][0]
+    return fetched[0]
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -86,7 +86,7 @@ def getWinner():
     Returns a String, the name of the winner of the tournament.
     """
     db = DB().execute("select name from standings where wins = (select max(wins) from standings);")
-    fetched = db["cursor"].fetchall()
+    fetched = db["cursor"].fetchone()
     db["conn"].close()
 
     return fetched
